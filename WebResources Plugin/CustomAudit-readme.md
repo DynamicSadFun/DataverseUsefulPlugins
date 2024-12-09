@@ -132,3 +132,164 @@ This plugin logs changes made to specific critical fields in any entity and stor
 - **Custom Logic**: The plugin lets you trigger workflows or other business processes directly tied to audit changes.
 - **Extensibility**: It can be extended to include additional logic, such as validation, notifications, or integrations with external systems.
 
+To implement a **Custom Audit** using the `CustomAudit` plugin as provided in the code, you need a clear design and documentation for both the infrastructure and the functionality. Below is a comprehensive step-by-step guide:
+
+---
+
+# HOW TO USE? 
+
+### **Infrastructure Requirements**
+To implement the Custom Audit functionality, you need:
+
+#### **1. Custom Tables in Dataverse**
+You need one or more tables to store audit data. Here's an example:
+
+1. **Table Name**: `CustomAuditLog`  
+   **Purpose**: To store the details of audited changes.
+   - **Columns**:
+     | Column Name          | Data Type       | Description                             |
+     |----------------------|-----------------|-----------------------------------------|
+     | `customauditlogid`   | GUID (Primary)  | Unique identifier for the audit log.   |
+     | `entityname`         | String          | Name of the entity being audited.      |
+     | `recordid`           | GUID            | ID of the record being audited.        |
+     | `fieldname`          | String          | Name of the field that changed.        |
+     | `oldvalue`           | String          | The previous value of the field.       |
+     | `newvalue`           | String          | The updated value of the field.        |
+     | `modifiedby`         | Lookup (User)   | User who made the change.              |
+     | `modifiedon`         | DateTime        | Timestamp of the change.               |
+     | `operationtype`      | Option Set      | Type of operation (Create/Update/Delete). |
+     | `customauditconfigid`| Lookup          | Reference to the audit configuration (optional). |
+
+---
+
+#### **2. Configuration Table**
+You can add a configuration table to define which entities and fields should be audited.
+
+1. **Table Name**: `CustomAuditConfiguration`
+   **Purpose**: To define the audit scope.
+   - **Columns**:
+     | Column Name         | Data Type       | Description                              |
+     |---------------------|-----------------|------------------------------------------|
+     | `customauditconfigid` | GUID (Primary) | Unique identifier for the configuration.|
+     | `entityname`        | String          | Name of the entity to audit.            |
+     | `fieldname`         | String          | Field to audit (optional).              |
+     | `operationtype`     | Option Set      | Operation type to audit (Create/Update/Delete). |
+
+---
+
+### **Plugin Code Workflow**
+
+#### **Step-by-Step Execution**
+1. **Trigger**:
+   - Register the plugin for the `Create`, `Update`, and `Delete` events.
+   - Target: Entities you wish to audit.
+   - Execution Stage: **Pre-Operation** or **Post-Operation** depending on requirements.
+
+2. **Audit Configuration**:
+   - Use the `GetAuditConfiguration` method to fetch the list of entities and fields to audit from `CustomAuditConfiguration`.
+
+3. **Field Change Detection**:
+   - For `Update` events, compare `Pre-Image` (old values) and `Target` (new values).
+   - Identify the fields that have changed.
+
+4. **Data Storage**:
+   - For every audited field, create a record in the `CustomAuditLog` table with:
+     - Entity name
+     - Record ID
+     - Field name
+     - Old value
+     - New value
+     - User who made the change
+     - Timestamp of the change
+
+5. **Additional Features**:
+   - Optionally, implement filtering by user roles, entity-specific conditions, or operation type.
+
+---
+
+### **Plugin Registration**
+
+#### **Steps**:
+1. **Register the Assembly**:
+   - Use the **Plugin Registration Tool** to register the compiled plugin assembly.
+
+2. **Register Steps**:
+   - Create steps for each entity and message (Create/Update/Delete).
+   - Enable `Pre-Image` for `Update` steps to capture old values.
+
+3. **Images**:
+   - **Pre-Image**: For `Update` events, to retrieve old values.
+   - **Post-Image**: For `Create` events, to retrieve newly created values.
+
+---
+
+### **CustomAudit Plugin Code Walkthrough**
+
+#### Key Methods
+1. **ExecuteDataversePlugin**:
+   - Core execution logic to identify changes and store audit logs.
+
+2. **GetAuditConfiguration**:
+   - Retrieves the audit configuration from `CustomAuditConfiguration` to determine the audit scope.
+
+3. **CreateAuditLog**:
+   - Saves audit records to the `CustomAuditLog` table.
+
+4. **DetectFieldChanges**:
+   - Compares `Pre-Image` and `Target` to identify field-level changes.
+
+---
+
+### **Deployment Checklist**
+
+#### **1. Custom Tables**:
+- Ensure `CustomAuditLog` and `CustomAuditConfiguration` tables are created and deployed to the environment.
+
+#### **2. Plugin Assembly**:
+- Compile the plugin code into a DLL and register it in the target environment.
+
+#### **3. Audit Configuration**:
+- Populate `CustomAuditConfiguration` with the required entities, fields, and operation types.
+
+#### **4. Plugin Steps**:
+- Register steps for all entities to be audited and ensure correct images are configured.
+
+---
+
+### **Example Use Case**
+
+#### Scenario:
+Auditing changes to the `Account` entity, specifically for:
+- Field `accountnumber` (Track all changes).
+- Operations: Create, Update, and Delete.
+
+#### Configuration:
+- Add a record to `CustomAuditConfiguration`:
+  - Entity: `Account`
+  - Field: `accountnumber`
+  - Operations: Update
+
+#### Result:
+- When a user updates the `accountnumber` field, the plugin creates a record in `CustomAuditLog` with:
+  - The old and new values of `accountnumber`.
+  - The user who made the change.
+  - The timestamp.
+
+---
+
+### **Best Practices**
+1. **Use Pre/Post Images Judiciously**:
+   - Only enable images for steps where they are necessary, to minimize performance overhead.
+
+2. **Validate Configuration**:
+   - Ensure the `CustomAuditConfiguration` table is populated correctly to avoid unnecessary execution.
+
+3. **Error Handling**:
+   - Implement proper exception handling to avoid breaking operations.
+
+4. **Performance Monitoring**:
+   - Regularly monitor plugin execution time and optimize fetch operations.
+
+5. **Data Retention**:
+   - Set retention policies for `CustomAuditLog` to manage storage.
+
