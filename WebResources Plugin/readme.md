@@ -2,7 +2,7 @@
 
 ## 📄 Overview
 
-The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to streamline and enhance the behavior of the `webresource` entity. It ensures consistency and automation for managing web resource extensions during record creation or update processes.
+The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to streamline and enhance the behavior of the `webresource` entity. It ensures consistency and automation for managing web resource extensions during record creation process.
 
 ### 🎯 Key Features
 
@@ -16,7 +16,7 @@ The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to 
 
 ### **Trigger Point**
 - **Entity**: `webresource`
-- **Message**: `Create`, `Update`
+- **Message**: `Create`
 - **Stage**: **Pre-Operation**
 
 ### **Logic Workflow**
@@ -32,7 +32,7 @@ The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to 
 ### 1. **Registering the Plugin**
 - Use the **Plugin Registration Tool** to register this plugin with the following configurations:
   - **Entity**: `webresource`
-  - **Message**: `Create`, `Update`
+  - **Message**: `Create`
   - **Stage**: `Pre-Operation`
   - **Execution Mode**: `Synchronous`
   
@@ -79,29 +79,9 @@ if (targetEntity.Attributes.Contains("name") &&
     }
 }
 ```
-
----
-
-## 🧪 Testing
-
-1. **Unit Tests**: Validate behavior under various scenarios (missing attributes, correct extension, etc.).
-2. **Test Cases**:
-   - Input `webresourcetype = 1` (JavaScript), `name = "myScript"` → Output: `name = "myScript.js"`.
-   - Input `webresourcetype = 2` (HTML), `name = "page"` → Output: `name = "page.html"`.
-
----
-
 ## 🚨 Error Handling
 
 - **Missing Attributes**: Throws an exception if `name` or `webresourcetype` is not provided.
 - **Invalid Web Resource Type**: Returns a descriptive error if the type is unknown or unsupported.
 
----
 
-## 🛡️ License
-
-This plugin follows the repository's **MIT License**.
-
----
-
-Let me know if you need any additional information or tweaks!
