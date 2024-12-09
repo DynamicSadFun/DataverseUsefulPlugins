@@ -1,9 +1,9 @@
 using Microsoft.Xrm.Sdk;
 using System;
-using EMA.CE.InternalUsage.Helper.Constants;
-using static EMA.CE.InternalUsage.Helper.Constants.Attributes;
+using DataverseUsefulPlugins.Helper.Constants;
+using static DataverseUsefulPlugins.Helper.Constants.Attributes;
 
-namespace EMA.CE.InternalUsage
+namespace DataverseUsefulPlugins
 {
     public class WebResourceAddExtension : PluginBase
     {
