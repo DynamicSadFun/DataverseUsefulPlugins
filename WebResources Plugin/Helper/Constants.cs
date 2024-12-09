@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EMA.CE.InternalUsage.Helper.Constants
+namespace DataverseUsefulPlugins.Helper.Constants
 {
     public static class EntityNames
     {
