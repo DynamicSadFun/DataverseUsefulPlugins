@@ -62,7 +62,7 @@ namespace DataverseUsefulPlugins
         private AuditConfiguration GetAuditConfiguration(IOrganizationService service, string entityName)
         {
             // Query the AuditConfiguration table for the entity
-            var query = new QueryExpression("auditconfiguration")
+            var query = new QueryExpression("customauditconfiguration")
             {
                 ColumnSet = new ColumnSet("attributes", "logicalname"),
                 Criteria = new FilterExpression
@@ -88,7 +88,7 @@ namespace DataverseUsefulPlugins
 
         private void LogAudit(IOrganizationService service, string entityName, Guid recordId, string fieldName, object oldValue, object newValue, Guid userId, string operation)
         {
-            var auditLog = new Entity("auditlog")
+            var auditLog = new Entity("customauditlog")
             {
                 ["entityname"] = entityName,
                 ["recordid"] = recordId.ToString(),
