@@ -2,6 +2,8 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Linq;
+using DataverseUsefulPlugins.Helper.Constants;
+using static DataverseUsefulPlugins.Helper.Constants.Attributes;
 
 namespace DataverseUsefulPlugins
 {
@@ -21,38 +23,40 @@ namespace DataverseUsefulPlugins
 
             var context = localPluginContext.PluginExecutionContext;
 
-            // Check if Target input parameter is a valid Entity
-            if (context.InputParameters.Contains("Target") && context.InputParameters["Target"] is Entity targetEntity)
+            // Validate that the Target parameter exists and is an Entity
+            if (!(context.InputParameters.TryGetValue(Target, out var target) && target is Entity targetEntity))
             {
-                var service = localPluginContext.OrganizationService;
-                var tracingService = localPluginContext.TracingService;
+                return; // Exit if no valid target entity
+            }
 
-                // Retrieve configuration for auditing
-                var auditConfig = GetAuditConfiguration(service, targetEntity.LogicalName);
-                if (auditConfig == null || !auditConfig.AttributesToAudit.Any())
+            var service = localPluginContext.OrganizationService;
+            var tracingService = localPluginContext.TracingService;
+
+            // Retrieve configuration for auditing
+            var auditConfig = GetAuditConfiguration(service, targetEntity.LogicalName);
+            if (auditConfig == null || !auditConfig.AttributesToAudit.Any())
+            {
+                return; // No configuration for this entity
+            }
+
+            // Pre-image contains the current values of the record
+            Entity preImage = context.PreEntityImages.Contains("PreImage") ? context.PreEntityImages["PreImage"] : null;
+
+            // Process changes
+            foreach (var attribute in targetEntity.Attributes)
+            {
+                if (auditConfig.AttributesToAudit.Contains(attribute.Key))
                 {
-                    return; // No configuration for this entity
-                }
+                    var newValue = targetEntity[attribute.Key];
+                    var oldValue = preImage != null && preImage.Contains(attribute.Key) ? preImage[attribute.Key] : null;
 
-                // Pre-image contains the current values of the record
-                Entity preImage = context.PreEntityImages.Contains("PreImage") ? context.PreEntityImages["PreImage"] : null;
-
-                // Process changes
-                foreach (var attribute in targetEntity.Attributes)
-                {
-                    if (auditConfig.AttributesToAudit.Contains(attribute.Key))
+                    if (!AreValuesEqual(oldValue, newValue))
                     {
-                        var newValue = targetEntity[attribute.Key];
-                        var oldValue = preImage != null && preImage.Contains(attribute.Key) ? preImage[attribute.Key] : null;
-
-                        if (!AreValuesEqual(oldValue, newValue))
-                        {
-                            // Log change to the AuditLog table
-                            LogAudit(service, targetEntity.LogicalName, targetEntity.Id, attribute.Key, oldValue, newValue, context.UserId, context.MessageName);
-                        }
+                        // Log change to the AuditLog table
+                        LogAudit(service, targetEntity.LogicalName, targetEntity.Id, attribute.Key, oldValue, newValue, context.UserId, context.MessageName);
                     }
                 }
-            }
+            }            
         }
 
         private AuditConfiguration GetAuditConfiguration(IOrganizationService service, string entityName)
