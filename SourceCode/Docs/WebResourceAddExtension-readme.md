@@ -2,11 +2,13 @@
 
 ## 📄 Overview
 
-The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to streamline and enhance the behavior of the `webresource` entity. It ensures consistency and automation for managing web resource extensions during record creation process.
+The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to streamline and enhance the behavior of the `webresource` entity. It ensures consistency and automation for managing web resource extensions during the record creation process.
+
+![webres](https://github.com/user-attachments/assets/df1d990c-fcb4-44ce-8f76-77dfb4db9b0a)
 
 ### 🎯 Key Features
 
-- Automatically appends the correct file extension to the **Logical Name** (`name`) and **Display Name** (`displayname`) of a web resource, based on its type.
+- Automatically appends the correct file extension to the **Logical Name** (`name`) of a web resource, based on its type.
 - Prevents duplicate extensions by validating the current values.
 - Enforces a clean and standardized naming convention for web resources, reducing manual errors.
 
@@ -22,7 +24,7 @@ The **WebResources Plugin** is a **Pre-Operation Dataverse plugin** designed to 
 ### **Logic Workflow**
 1. **Input Validation**: Checks if the `name` attribute (Logical Name) and `webresourcetype` attribute are present in the `Target` entity.
 2. **Determine Extension**: Extracts the appropriate file extension for the web resource using the `webresourcetype` attribute.
-3. **Extension Check**: If the extension is missing or incorrect, it appends the correct extension to the Logical Name and Display Name.
+3. **Extension Check**: If the extension is missing or incorrect, it appends the correct extension to the Logical Name.
 4. **Error Handling**: Throws a descriptive error if the extension cannot be determined or other required attributes are missing.
 
 ---
@@ -70,12 +72,8 @@ if (targetEntity.Attributes.Contains("name") &&
     string extension = WebResourceHelper.GetExtensionByType(webResourceType);
     if (!string.IsNullOrEmpty(extension) && !logicalName.EndsWith($".{extension}", StringComparison.OrdinalIgnoreCase))
     {
-        // Update logical name and display name with the correct extension
+        // Update logical name with the correct extension
         targetEntity["name"] = $"{logicalName}.{extension}";
-        if (targetEntity.Attributes.Contains("displayname"))
-        {
-            targetEntity["displayname"] = $"{logicalName}.{extension}";
-        }
     }
 }
 ```
