@@ -1,6 +1,6 @@
 # Dynamic Parent-Child Rollup Calculation Plugin
 
-## Overview
+## 📄 Overview
 
 The **Dynamic Parent-Child Rollup Calculation** plugin enables real-time aggregation of values from child records to parent records in Microsoft Dataverse. It is highly configurable and supports various aggregation types like **Sum**, **Count**, and **Average**.
 
