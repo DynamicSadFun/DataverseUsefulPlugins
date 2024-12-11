@@ -1,6 +1,6 @@
-### **Plugin: Audit Activity for Critical Fields**
+# Custom Audit Activity for Critical Fields
 
-#### **Description**
+## 📄 Overview
 
 This plugin logs changes made to specific critical fields in any entity and stores the change history in a custom `AuditLog` table. This is useful for tracking updates to sensitive data, providing a more detailed audit trail than the out-of-the-box Dataverse audit functionality.
 
