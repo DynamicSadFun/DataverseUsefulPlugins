@@ -1,4 +1,4 @@
-# Dataverse Useful Plugins
+# Dataverse Useful Plugins\
 
 This repository contains a collection of **useful plugins for Microsoft Dataverse**, tailored to address common development challenges and extend Dataverse functionality with custom business logic. Each plugin is built with robust practices and optimized for performance in Dataverse environments.
 
